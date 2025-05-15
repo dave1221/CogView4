@@ -87,3 +87,16 @@ if __name__ == "__main__":
         output_path=args.output_path,
         dtype=dtype,
     )
+
+    # 实际测试
+    generate_image(
+        prompt="生成一幅哪吒的3维图画",
+        model_path="/home/jiangzhu/project/models/t2i/CogView4-6B",
+        guidance_scale=3.5,
+        num_images_per_prompt=1,
+        num_inference_steps=50,
+        width=256,
+        height=256,
+        output_path="cogview4.png",
+        dtype=torch.bfloat16,
+    )
