@@ -15,4 +15,4 @@ diffusers[torch]
 sentencepiece>=0.2.0
 openai>=1.61.0
 bitsandbytes>=0.45.2
-torchao>=0.9.0
+torchao

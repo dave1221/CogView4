@@ -1,0 +1,58 @@
+# 使用包含CUDA 12.1和cuDNN 8的Ubuntu 22.04基础镜像
+FROM nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04
+
+# 设置环境变量避免交互式提示
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PATH="/usr/local/bin:$PATH"
+
+# 安装系统依赖
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-dev \
+    git \
+    wget \
+    curl \  # 添加curl用于安装uv
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装uv（替代pip的更快安装工具）
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh -s -- --yes --no-modify-path && \
+    # 创建软链接确保uv全局可用（原安装路径为~/.cargo/bin/uv）
+    ln -s /root/.cargo/bin/uv /usr/local/bin/uv && \
+    # 初始化uv虚拟环境
+    uv venv && \
+    # 激活虚拟环境
+    . .venv/bin/activate
+
+# 创建python软链接
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制requirements文件
+COPY requirements.txt .
+
+# 使用uv安装Python依赖（替代pip）
+RUN uv pip install \
+    --no-cache-dir \  # 禁用缓存
+    --upgrade \       # 升级已有包
+    -r requirements.txt
+
+# 复制应用程序文件
+COPY gradio_web_demo_custom.py .
+# 如果需要复制整个目录：
+# COPY inference ./inference
+
+# 暴露端口
+EXPOSE 7134
+
+# 运行命令（保持与之前一致）
+CMD ["python", "gradio_web_demo_custom.py", \
+    "-c", "/app/models/CogView4-6B", \
+    "--mode", "3", \
+    "--server-port", "7134"]

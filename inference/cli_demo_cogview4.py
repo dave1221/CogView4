@@ -31,7 +31,7 @@ def generate_image(
     # pipe = CogView4Pipeline.from_pretrained(model_path, text_encoder=text_encoder, torch_dtype=dtype)
     pipe = CogView4Pipeline.from_pretrained(model_path, torch_dtype=dtype)
 
-    # pipe.to("cuda")
+    pipe.to("cuda")
     pipe.enable_model_cpu_offload()
     pipe.vae.enable_slicing()
     pipe.vae.enable_tiling()
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     # 实际测试
     generate_image(
         prompt="生成一幅哪吒的3维图画",
-        model_path="/home/jiangzhu/project/models/t2i/CogView4-6B",
+        model_path=r"/home/jiangzhu/project/models/t2i/CogView4-6B",
         guidance_scale=3.5,
         num_images_per_prompt=1,
         num_inference_steps=50,
